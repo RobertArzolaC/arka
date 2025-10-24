@@ -5,6 +5,12 @@ from apps.users import api, views
 app_name = "apps.users"
 
 urlpatterns = [
+    # User management URLs
+    path("", views.UserListView.as_view(), name="user_list"),
+    path("add/", views.UserCreateView.as_view(), name="user_create"),
+    path("<int:pk>/edit/", views.UserUpdateView.as_view(), name="user_update"),
+    path("<int:pk>/delete/", views.UserDeleteView.as_view(), name="user_delete"),
+    # Profile and settings URLs
     path("profile/", views.ProfileView.as_view(), name="profile"),
     path("settings/", views.SettingsView.as_view(), name="settings"),
     # API URLs

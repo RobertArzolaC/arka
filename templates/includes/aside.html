@@ -20,7 +20,7 @@
         </div>
         <div class="menu-item">
           {% if perms.customers.view_account %}
-            <a class="menu-link {% if "accounts" in request.path %}active{% endif %}" href="{% url 'apps.customers:account_list' %}">
+            <a class="menu-link" href="">
               <span class="menu-icon">
                 <i class="ki-duotone ki-people fs-2 me-2">
                   <span class="path1"></span>
@@ -31,97 +31,32 @@
                 </i>
               </span>
               <span class="menu-title">
-                {% trans 'Accounts' %}
-              </span>
-            </a>
-          {% endif %}
-          {% if perms.customers.view_patient %}
-            <a class="menu-link {% if "patients" in request.path %}active{% endif %}" href="">
-              <span class="menu-icon">
-                <i class="fa-solid fa-hospital-user"></i>
-              </span>
-              <span class="menu-title">
-                {% trans 'Patients' %}
-              </span>
-            </a>
-          {% endif %}
-          {% if perms.laboratory.view_medicaltest %}
-            <a class="menu-link {% if "medical_tests" in request.path %}active{% endif %}" href="">
-              <span class="menu-icon">
-                <i class="fa-solid fa-flask"></i>
-              </span>
-              <span class="menu-title">
-                {% trans 'Medical Tests' %}
-              </span>
-            </a>
-          {% endif %}
-          {% if perms.laboratory.view_panel %}
-            <a class="menu-link {% if "panels" in request.path %}active{% endif %}" href="">
-              <span class="menu-icon">
-                <i class="fa-solid fa-flask-vial"></i>
-              </span>
-              <span class="menu-title">
-                {% trans 'Panels' %}
-              </span>
-            </a>
-          {% endif %}
-          {% if perms.laboratory.view_order %}
-            <a class="menu-link {% if "/orders/" in request.path %}active{% endif %}" href="">
-              <span class="menu-icon">
-                <i class="fa-solid fa-notes-medical"></i>
-              </span>
-              <span class="menu-title">
-                {% trans 'Orders' %}
-              </span>
-            </a>
-          {% endif %}
-          {% if perms.laboratory.view_orderresult %}
-            <a class="menu-link {% if "results" in request.path %}active{% endif %}" href="">
-              <span class="menu-icon">
-                <i class="fa-solid fa-briefcase-medical"></i>
-              </span>
-              <span class="menu-title">
-                {% trans 'Results' %}
-              </span>
-            </a>
-          {% endif %}
-          {% if perms.laboratory.view_directorder %}
-            <a class="menu-link {% if "/direct-orders/" in request.path %}active{% endif %}" href="">
-              <span class="menu-icon">
-                <i class="ki-duotone ki-delivery-3">
-                  <span class="path1"></span>
-                  <span class="path2"></span>
-                  <span class="path3"></span>
-                </i>
-              </span>
-              <span class="menu-title">
-                {% trans 'Direct Orders' %}
-              </span>
-            </a>
-          {% endif %}
-          {% if perms.laboratory.report_order %}
-            <a class="menu-link {% if "/orders/export/" in request.path %}active{% endif %}" href="">
-              <span class="menu-icon">
-                <i class="ki-duotone ki-cheque">
-                  <span class="path1"></span>
-                  <span class="path2"></span>
-                  <span class="path3"></span>
-                  <span class="path4"></span>
-                  <span class="path5"></span>
-                  <span class="path6"></span>
-                  <span class="path7"></span>
-                </i>
-              </span>
-              <span class="menu-title">
-                {% trans 'Reports' %}
+                {% trans 'Main' %}
               </span>
             </a>
           {% endif %}
         </div>
-        <div class="menu-item">
+        <div class="menu-item pt-5">
           <div class="menu-content">
-            <div class="separator mx-1 my-4"></div>
+            <span class="fw-bold text-muted text-uppercase fs-7">
+              {% trans 'Administration' %}
+            </span>
           </div>
+        </div>
+        <div class="menu-item">
+          {% if perms.auth.view_user %}
+            <a class="menu-link {% if "/users/" in request.path %}active{% endif %}" href="{% url 'apps.users:user_list' %}">
+              <span class="menu-icon">
+                <i class="ki-duotone ki-user fs-2 me-2">
+                  <span class="path1"></span>
+                  <span class="path2"></span>
+                </i>
+              </span>
+              <span class="menu-title">
+                {% trans 'Users' %}
+              </span>
+            </a>
+          {% endif %}
         </div>
       </div>
     </div>
