@@ -70,7 +70,9 @@ class UserListViewTest(TestCase):
 
     def test_filter_by_active_status(self) -> None:
         """Test filtering users by active status."""
-        active_user = factories.UserFactory(is_active=True, first_name="ActiveUser", last_name="Test")
+        active_user = factories.UserFactory(
+            is_active=True, first_name="ActiveUser", last_name="Test"
+        )
         inactive_user = factories.UserFactory(
             is_active=False, first_name="InactiveUser", last_name="Test"
         )
@@ -186,7 +188,9 @@ class UserUpdateViewTest(TestCase):
             email="john.doe@example.com",
         )
         self.group = Group.objects.create(name="Test Group")
-        self.url = reverse("apps.users:user_update", args=[self.user_to_update.pk])
+        self.url = reverse(
+            "apps.users:user_update", args=[self.user_to_update.pk]
+        )
 
     def test_get_requires_login(self) -> None:
         """Test that view requires authentication."""
@@ -278,7 +282,9 @@ class UserDeleteViewTest(TestCase):
         self.admin.user_permissions.add(permission)
 
         self.user_to_delete = factories.UserFactory(email="delete@example.com")
-        self.url = reverse("apps.users:user_delete", args=[self.user_to_delete.pk])
+        self.url = reverse(
+            "apps.users:user_delete", args=[self.user_to_delete.pk]
+        )
 
     def test_get_requires_login(self) -> None:
         """Test that view requires authentication."""

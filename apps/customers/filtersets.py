@@ -6,7 +6,9 @@ from apps.customers import models
 
 
 class AccountFilter(django_filters.FilterSet):
-    name_search = django_filters.CharFilter(method="filter_by_name", label=_("Search"))
+    name_search = django_filters.CharFilter(
+        method="filter_by_name", label=_("Search")
+    )
     is_active = django_filters.ChoiceFilter(
         field_name="user__is_active",
         empty_label=_("Active"),
@@ -35,4 +37,25 @@ class AccountFilter(django_filters.FilterSet):
             Q(user__first_name__icontains=value)  # noqa
             | Q(user__last_name__icontains=value)  # noqa
             | Q(user__email__icontains=value)  # noqa
+        )
+
+
+class CompanyFilter(django_filters.FilterSet):
+    """Filter for Company listing."""
+
+    search = django_filters.CharFilter(
+        method="filter_by_search", label=_("Search")
+    )
+
+    class Meta:
+        model = models.Company
+        fields = ["search"]
+
+    def filter_by_search(self, queryset, name, value):
+        """Filter by domain, RUC, business name, or commercial name."""
+        return queryset.filter(
+            Q(domain__icontains=value)
+            | Q(ruc__icontains=value)
+            | Q(business_name__icontains=value)
+            | Q(commercial_name__icontains=value)
         )

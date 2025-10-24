@@ -39,6 +39,30 @@
         <div class="menu-item pt-5">
           <div class="menu-content">
             <span class="fw-bold text-muted text-uppercase fs-7">
+              {% trans 'Customers' %}
+            </span>
+          </div>
+        </div>
+        <div class="menu-item">
+          {% if perms.customers.view_company %}
+            <a class="menu-link {% if "/customers/companies/" in request.path %}active{% endif %}" href="{% url 'apps.customers:company_list' %}">
+              <span class="menu-icon">
+                <i class="ki-duotone ki-office-bag fs-2 me-2">
+                  <span class="path1"></span>
+                  <span class="path2"></span>
+                  <span class="path3"></span>
+                  <span class="path4"></span>
+                </i>
+              </span>
+              <span class="menu-title">
+                {% trans 'Companies' %}
+              </span>
+            </a>
+          {% endif %}
+        </div>
+        <div class="menu-item pt-5">
+          <div class="menu-content">
+            <span class="fw-bold text-muted text-uppercase fs-7">
               {% trans 'Administration' %}
             </span>
           </div>

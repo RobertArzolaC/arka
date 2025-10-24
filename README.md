@@ -35,11 +35,11 @@
    python manage.py runserver
    ```
 
-## Location Information
+## Load Data
 
-1. **Get Location Information**
+1. **Load Location Information**
 ```bash
-   python manage.py cities_light
+   python manage.py loaddata apps/core/fixtures/ubigeo_data.json
 ```
 
 ## Coverage
