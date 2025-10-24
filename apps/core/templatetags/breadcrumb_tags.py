@@ -7,6 +7,19 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def breadcrumb(context):
+    """
+    Generate breadcrumbs automatically or use custom breadcrumbs from context.
+
+    If 'custom_breadcrumbs' is present in the context, use those instead of
+    auto-generating breadcrumbs from the URL path.
+
+    Returns:
+        list: List of breadcrumb dictionaries with 'title', 'url', and 'is_active' keys.
+    """
+    # Check if custom breadcrumbs are provided in context
+    if "custom_breadcrumbs" in context:
+        return context["custom_breadcrumbs"]
+
     request = context["request"]
     breadcrumbs = [
         {

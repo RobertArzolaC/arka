@@ -1,12 +1,11 @@
 from allauth.account.models import EmailAddress
-from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from model_utils.models import SoftDeletableModel, TimeStampedModel
 
 from apps.core import models as core_models
-from apps.customers import choices
+from apps.customers import choices, validators
 from apps.users.models import User
 
 
@@ -32,21 +31,22 @@ class Account(SoftDeletableModel, TimeStampedModel):
 
     @cached_property
     def is_email_verified(self):
-        return EmailAddress.objects.filter(user=self.user, verified=True).exists()
+        return EmailAddress.objects.filter(
+            user=self.user, verified=True
+        ).exists()
 
 
-class Company(core_models.BaseAddress, core_models.BaseContact, SoftDeletableModel, TimeStampedModel):
+class Company(
+    core_models.BaseAddress,
+    core_models.BaseContact,
+    SoftDeletableModel,
+    TimeStampedModel,
+):
     """Model representing a company/organization in the system."""
-
-    domain_validator = RegexValidator(
-        regex=r"^[a-zA-Z0-9-]+$",
-        message=_("Domain must contain only alphanumeric characters and hyphens."),
-    )
 
     domain = models.CharField(
         max_length=100,
-        unique=True,
-        validators=[domain_validator],
+        validators=[validators.domain_validator],
         verbose_name=_("Domain"),
         help_text=_("Unique domain for accessing the system"),
     )
@@ -56,7 +56,7 @@ class Company(core_models.BaseAddress, core_models.BaseContact, SoftDeletableMod
         verbose_name=_("Tax Regime"),
     )
     ruc = models.CharField(
-        max_length=11, unique=True, verbose_name=_("RUC"), help_text=_("Tax ID Number")
+        max_length=11, verbose_name=_("RUC"), help_text=_("Tax ID Number")
     )
     business_name = models.CharField(
         max_length=255, verbose_name=_("Business Name")
@@ -85,6 +85,18 @@ class Company(core_models.BaseAddress, core_models.BaseContact, SoftDeletableMod
         verbose_name = _("Company")
         verbose_name_plural = _("Companies")
         ordering = ("business_name",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["ruc"],
+                condition=models.Q(is_removed=False),
+                name="unique_ruc_when_not_removed",
+            ),
+            models.UniqueConstraint(
+                fields=["domain"],
+                condition=models.Q(is_removed=False),
+                name="unique_domain_when_not_removed",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.commercial_name or self.business_name
@@ -165,3 +177,90 @@ class CompanyCertificate(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"Certificate for {self.company.commercial_name}"
+
+
+class Branch(
+    core_models.BaseNameDescription,
+    core_models.BaseAddress,
+    core_models.BaseContact,
+    SoftDeletableModel,
+    TimeStampedModel,
+):
+    """Model representing a company's branch or warehouse."""
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name="branches",
+        verbose_name=_("Company"),
+    )
+    sunat_code = models.CharField(
+        max_length=10,
+        verbose_name=_("SUNAT Establishment Code"),
+        help_text=_(
+            "Code for SUNAT annex establishment (e.g., '0000' for main branch)"
+        ),
+    )
+    website = models.URLField(
+        max_length=255,
+        blank=True,
+        verbose_name=_("Website"),
+    )
+
+    class Meta:
+        verbose_name = _("Branch")
+        verbose_name_plural = _("Branches")
+        ordering = ("company", "sunat_code")
+        unique_together = ("company", "sunat_code")
+
+    def __str__(self) -> str:
+        return (
+            f"{self.name} ({self.sunat_code}) - {self.company.commercial_name}"
+        )
+
+
+class DocumentSeries(SoftDeletableModel, TimeStampedModel):
+    """Model to manage document series for each branch."""
+
+    branch = models.ForeignKey(
+        Branch,
+        on_delete=models.CASCADE,
+        related_name="document_series",
+        verbose_name=_("Branch"),
+    )
+    document_type = models.CharField(
+        max_length=2,
+        choices=choices.DocumentTypeChoices.choices,
+        verbose_name=_("Document Type"),
+    )
+    series_number = models.CharField(
+        max_length=10,
+        verbose_name=_("Series Number"),
+        help_text=_("Series code (e.g., 'F001', 'B001', 'T001')"),
+    )
+    current_correlative = models.PositiveIntegerField(
+        default=1,
+        verbose_name=_("Current Correlative"),
+        help_text=_("Next sequential number to be used for this series"),
+    )
+
+    class Meta:
+        verbose_name = _("Document Series")
+        verbose_name_plural = _("Document Series")
+        ordering = ("branch", "document_type", "series_number")
+        unique_together = ("branch", "document_type", "series_number")
+
+    def __str__(self) -> str:
+        return f"{self.get_document_type_display()} - {self.series_number} ({self.branch.name})"
+
+    def get_next_correlative(self) -> str:
+        """
+        Get the next correlative number and increment the counter.
+
+        Returns:
+            str: Formatted correlative number with leading zeros (8 digits).
+        """
+        correlative = self.current_correlative
+        self.current_correlative += 1
+        self.save(update_fields=["current_correlative"])
+        return str(correlative).zfill(8)

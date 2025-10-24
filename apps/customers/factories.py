@@ -71,3 +71,41 @@ class CompanyCertificateFactory(factory.django.DjangoModelFactory):
     certificate_file = factory.django.FileField(filename="certificate.pfx")
     certificate_password = factory.Faker("password")
     certificate_pen = "-----BEGIN CERTIFICATE-----\nMOCK_DATA\n-----END CERTIFICATE-----"
+
+
+class BranchFactory(factory.django.DjangoModelFactory):
+    """Factory for creating Branch instances for testing."""
+
+    class Meta:
+        model = models.Branch
+
+    company = factory.SubFactory(CompanyFactory)
+    name = factory.Sequence(lambda n: f"Branch {n}")
+    description = factory.Faker("sentence")
+    sunat_code = factory.Sequence(lambda n: f"{n:04d}")
+    address = factory.Faker("street_address")
+    phone = factory.Faker("phone_number")
+    email = factory.Faker("company_email")
+    website = factory.Faker("url")
+
+
+class DocumentSeriesFactory(factory.django.DjangoModelFactory):
+    """Factory for creating DocumentSeries instances for testing."""
+
+    class Meta:
+        model = models.DocumentSeries
+
+    branch = factory.SubFactory(BranchFactory)
+    document_type = factory.Iterator(
+        [choice[0] for choice in models.choices.DocumentTypeChoices.choices]
+    )
+    series_number = factory.LazyAttribute(
+        lambda obj: {
+            "01": "F001",  # Factura
+            "03": "B001",  # Boleta
+            "07": "F001",  # Nota de Crédito
+            "08": "F001",  # Nota de Débito
+            "09": "T001",  # Guía de Remisión
+        }.get(obj.document_type, "F001")
+    )
+    current_correlative = 1

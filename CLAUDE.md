@@ -242,6 +242,7 @@ from django.test import TestCase
 class MyTestCase(TestCase):
     def setUp(self):
         self.user = factories.UserFactory()
+        # Optional: Add specific permissions if needed
         self.client.force_login(self.user)
 ```
 

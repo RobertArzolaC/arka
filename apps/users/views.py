@@ -1,14 +1,23 @@
 from typing import Any
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+)
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, ListView, TemplateView, UpdateView, View
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    TemplateView,
+    UpdateView,
+    View,
+)
 from django_filters.views import FilterView
 
 from apps.customers import forms as customer_forms
@@ -72,7 +81,9 @@ class SettingsView(SuccessMessageMixin, LoginRequiredMixin, View):
         context.update(kwargs)
         return context
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def get(
+        self, request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
         """
         Handle GET request.
 
@@ -86,7 +97,9 @@ class SettingsView(SuccessMessageMixin, LoginRequiredMixin, View):
         """
         return render(request, self.template_name, self.get_context_data())
 
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def post(
+        self, request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
         """
         Handle POST request.
 
@@ -131,7 +144,7 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
     context_object_name = "users"
     paginate_by = 10
     filterset_class = filters.UserFilter
-    permission_required = "auth.view_user"
+    permission_required = "users.view_user"
 
     def get_queryset(self) -> QuerySet[User]:
         """
@@ -176,7 +189,7 @@ class UserCreateView(
     template_name = "users/form.html"
     success_url = reverse_lazy("apps.users:user_list")
     success_message = _("User created successfully")
-    permission_required = "auth.add_user"
+    permission_required = "users.add_user"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
@@ -206,7 +219,7 @@ class UserUpdateView(
     template_name = "users/form.html"
     success_url = reverse_lazy("apps.users:user_list")
     success_message = _("User updated successfully")
-    permission_required = "auth.change_user"
+    permission_required = "users.change_user"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         """
@@ -231,9 +244,11 @@ class UserDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
     model = User
     success_url = reverse_lazy("apps.users:user_list")
-    permission_required = "auth.delete_user"
+    permission_required = "users.delete_user"
 
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def post(
+        self, request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
         """
         Handle POST request for user deletion.
 

@@ -1,11 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db import transaction
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.decorators.cache import cache_page
-
-from apps.core import choices
 
 
 class AjaxDeleteViewMixin(LoginRequiredMixin, View):
@@ -18,7 +15,9 @@ class AjaxDeleteViewMixin(LoginRequiredMixin, View):
             return JsonResponse(
                 {
                     "status": "success",
-                    "message": _(f"The {entity_name} was successfully deleted."),
+                    "message": _(
+                        f"The {entity_name} was successfully deleted."
+                    ),
                 }
             )
         except self.model.DoesNotExist:
@@ -27,13 +26,17 @@ class AjaxDeleteViewMixin(LoginRequiredMixin, View):
                 status=404,
             )
         except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+            return JsonResponse(
+                {"status": "error", "message": str(e)}, status=500
+            )
 
     def handle_no_permission(self):
         return JsonResponse(
             {
                 "status": "error",
-                "message": _("You do not have permission to delete this account."),
+                "message": _(
+                    "You do not have permission to delete this account."
+                ),
             },
             status=403,
         )
@@ -49,7 +52,9 @@ class CacheMixin(LoginRequiredMixin):
         """
         Genera un prefijo único basado en el usuario autenticado.
         """
-        user_id = request.user.id if request.user.is_authenticated else "anonymous"
+        user_id = (
+            request.user.id if request.user.is_authenticated else "anonymous"
+        )
         return f"user_{user_id}"
 
     def dispatch(self, request, *args, **kwargs):

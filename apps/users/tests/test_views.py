@@ -1,5 +1,3 @@
-"""Tests for user views."""
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
@@ -16,11 +14,15 @@ class UserListViewTest(TestCase):
     def setUp(self) -> None:
         """Set up test data."""
         self.user = factories.UserFactory()
-        self.client.force_login(self.user)
 
-        # Add view_user permission
-        permission = Permission.objects.get(codename="view_user")
+        # Add view_user permission before login - use users app permission
+        permission = Permission.objects.get(
+            codename="view_user", content_type__app_label="users"
+        )
         self.user.user_permissions.add(permission)
+
+        # Login after adding permissions
+        self.client.force_login(self.user)
 
         self.url = reverse("apps.users:user_list")
 
@@ -29,11 +31,14 @@ class UserListViewTest(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
-        self.assertIn("/account/login/", response.url)
+        # The project redirects to home page with next parameter instead of /account/login/
+        self.assertIn("?next=/users/", response.url)
 
     def test_get_requires_permission(self) -> None:
         """Test that view requires view_user permission."""
-        user_without_permission = factories.UserFactory()
+        user_without_permission = factories.UserFactory(
+            is_staff=False, is_superuser=False
+        )
         self.client.force_login(user_without_permission)
 
         response = self.client.get(self.url)
@@ -47,12 +52,8 @@ class UserListViewTest(TestCase):
 
     def test_lists_users(self) -> None:
         """Test that view lists all users."""
-        # Give permission to view users
-        permission = Permission.objects.get(codename="view_user")
-        self.user.user_permissions.add(permission)
-
-        user1 = factories.UserFactory(first_name="John", last_name="Doe")
-        user2 = factories.UserFactory(first_name="Jane", last_name="Smith")
+        factories.UserFactory(first_name="John", last_name="Doe")
+        factories.UserFactory(first_name="Jane", last_name="Smith")
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -61,8 +62,8 @@ class UserListViewTest(TestCase):
 
     def test_filter_by_name(self) -> None:
         """Test filtering users by name."""
-        user1 = factories.UserFactory(first_name="John", last_name="Doe")
-        user2 = factories.UserFactory(first_name="Jane", last_name="Smith")
+        factories.UserFactory(first_name="John", last_name="Doe")
+        factories.UserFactory(first_name="Jane", last_name="Smith")
 
         response = self.client.get(self.url, {"name_search": "John"})
         self.assertEqual(response.status_code, 200)
@@ -70,10 +71,10 @@ class UserListViewTest(TestCase):
 
     def test_filter_by_active_status(self) -> None:
         """Test filtering users by active status."""
-        active_user = factories.UserFactory(
+        factories.UserFactory(
             is_active=True, first_name="ActiveUser", last_name="Test"
         )
-        inactive_user = factories.UserFactory(
+        factories.UserFactory(
             is_active=False, first_name="InactiveUser", last_name="Test"
         )
 
@@ -83,11 +84,11 @@ class UserListViewTest(TestCase):
 
     def test_pagination(self) -> None:
         """Test pagination works correctly."""
-        for i in range(15):
-            factories.UserFactory(first_name=f"User{i}")
+        factories.UserFactory.create_batch(15)
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
         # FilterView uses page_obj instead of is_paginated
         self.assertTrue(response.context["page_obj"].has_other_pages())
         self.assertEqual(len(response.context["users"]), 10)
@@ -101,11 +102,15 @@ class UserCreateViewTest(TestCase):
         self.user = factories.StaffUserFactory()
         self.user.is_superuser = False
         self.user.save()
-        self.client.force_login(self.user)
 
-        # Add add_user permission
-        permission = Permission.objects.get(codename="add_user")
+        # Add add_user permission before login - use users app permission
+        permission = Permission.objects.get(
+            codename="add_user", content_type__app_label="users"
+        )
         self.user.user_permissions.add(permission)
+
+        # Login after adding permissions
+        self.client.force_login(self.user)
 
         self.group = Group.objects.create(name="Test Group")
         self.url = reverse("apps.users:user_create")
@@ -176,11 +181,15 @@ class UserUpdateViewTest(TestCase):
         self.admin = factories.StaffUserFactory()
         self.admin.is_superuser = False
         self.admin.save()
-        self.client.force_login(self.admin)
 
-        # Add change_user permission
-        permission = Permission.objects.get(codename="change_user")
+        # Add change_user permission before login - use users app permission
+        permission = Permission.objects.get(
+            codename="change_user", content_type__app_label="users"
+        )
         self.admin.user_permissions.add(permission)
+
+        # Login after adding permissions
+        self.client.force_login(self.admin)
 
         self.user_to_update = factories.UserFactory(
             first_name="John",
@@ -275,11 +284,15 @@ class UserDeleteViewTest(TestCase):
         self.admin = factories.StaffUserFactory()
         self.admin.is_superuser = False
         self.admin.save()
-        self.client.force_login(self.admin)
 
-        # Add delete_user permission
-        permission = Permission.objects.get(codename="delete_user")
+        # Add delete_user permission before login - use users app permission
+        permission = Permission.objects.get(
+            codename="delete_user", content_type__app_label="users"
+        )
         self.admin.user_permissions.add(permission)
+
+        # Login after adding permissions
+        self.client.force_login(self.admin)
 
         self.user_to_delete = factories.UserFactory(email="delete@example.com")
         self.url = reverse(

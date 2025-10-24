@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
-{% block title_page%}{% trans "Companies" %}{% endblock title_page %}
+{% block title_page%}{% trans "Branches" %}{% endblock title_page %}
 {% block toolbar_title %}{{ form_title }}{% endblock%}
 
 {% block extra_head %}
@@ -23,88 +23,47 @@
             </div>
 
             <div class="card-body border-top p-9">
-                <!-- Domain -->
+                <!-- Name -->
                 <div class="row mb-6">
                     <label class="col-lg-4 col-form-label required fw-semibold fs-6">
-                        {{ form.domain.label }}
+                        {{ form.name.label }}
                     </label>
                     <div class="col-lg-8 fv-row">
-                        {% render_field form.domain class="form-control form-control-lg" placeholder="mi-empresa" %}
-                        <div class="form-text">{% trans "Only alphanumeric characters and hyphens allowed" %}</div>
-                        {% if form.domain.errors %}
+                        {% render_field form.name class="form-control form-control-lg" %}
+                        {% if form.name.errors %}
                             <div class="fv-plugins-message-container invalid-feedback">
-                                {{ form.domain.errors }}
+                                {{ form.name.errors }}
                             </div>
                         {% endif %}
                     </div>
                 </div>
 
-                <!-- Regime -->
+                <!-- Description -->
                 <div class="row mb-6">
-                    <label class="col-lg-4 col-form-label required fw-semibold fs-6">
-                        {{ form.regime.label }}
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.description.label }}
                     </label>
                     <div class="col-lg-8 fv-row">
-                        {% render_field form.regime class="form-select form-select-lg" %}
-                        {% if form.regime.errors %}
+                        {% render_field form.description class="form-control" %}
+                        {% if form.description.errors %}
                             <div class="fv-plugins-message-container invalid-feedback">
-                                {{ form.regime.errors }}
+                                {{ form.description.errors }}
                             </div>
                         {% endif %}
                     </div>
                 </div>
 
-                <!-- RUC with SUNAT lookup button -->
+                <!-- SUNAT Code -->
                 <div class="row mb-6">
                     <label class="col-lg-4 col-form-label required fw-semibold fs-6">
-                        {{ form.ruc.label }}
+                        {{ form.sunat_code.label }}
                     </label>
                     <div class="col-lg-8 fv-row">
-                        <div class="input-group">
-                            {% render_field form.ruc class="form-control form-control-lg" placeholder="20XXXXXXXXX" %}
-                            <button type="button" class="btn btn-primary" id="lookup-ruc-btn">
-                                <i class="ki-duotone ki-search-list fs-3">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                    <span class="path3"></span>
-                                </i>
-                                {% trans "Lookup SUNAT" %}
-                            </button>
-                        </div>
-                        <div class="form-text">{% trans "11-digit tax identification number" %}</div>
-                        {% if form.ruc.errors %}
+                        {% render_field form.sunat_code class="form-control form-control-lg" placeholder="0001" %}
+                        <div class="form-text">{% trans "4-digit establishment code for SUNAT (e.g., 0000, 0001, 0002)" %}</div>
+                        {% if form.sunat_code.errors %}
                             <div class="fv-plugins-message-container invalid-feedback">
-                                {{ form.ruc.errors }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Business Name -->
-                <div class="row mb-6">
-                    <label class="col-lg-4 col-form-label required fw-semibold fs-6">
-                        {{ form.business_name.label }}
-                    </label>
-                    <div class="col-lg-8 fv-row">
-                        {% render_field form.business_name class="form-control form-control-lg" %}
-                        {% if form.business_name.errors %}
-                            <div class="fv-plugins-message-container invalid-feedback">
-                                {{ form.business_name.errors }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Commercial Name -->
-                <div class="row mb-6">
-                    <label class="col-lg-4 col-form-label required fw-semibold fs-6">
-                        {{ form.commercial_name.label }}
-                    </label>
-                    <div class="col-lg-8 fv-row">
-                        {% render_field form.commercial_name class="form-control form-control-lg" %}
-                        {% if form.commercial_name.errors %}
-                            <div class="fv-plugins-message-container invalid-feedback">
-                                {{ form.commercial_name.errors }}
+                                {{ form.sunat_code.errors }}
                             </div>
                         {% endif %}
                     </div>
@@ -112,7 +71,7 @@
 
                 <!-- Address -->
                 <div class="row mb-6">
-                    <label class="col-lg-4 col-form-label required fw-semibold fs-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
                         {{ form.address.label }}
                     </label>
                     <div class="col-lg-8 fv-row">
@@ -214,6 +173,21 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <!-- Website -->
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.website.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.website class="form-control form-control-lg" %}
+                        {% if form.website.errors %}
+                            <div class="fv-plugins-message-container invalid-feedback">
+                                {{ form.website.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
             <div class="card-footer d-flex justify-content-end py-6 px-9">
@@ -238,50 +212,6 @@
             theme: 'bootstrap-5',
             width: '100%',
             placeholder: '{% trans "Select an option" %}'
-        });
-
-
-        // Mock SUNAT RUC lookup (placeholder for actual API integration)
-        $('#lookup-ruc-btn').click(function() {
-            const ruc = $('#id_ruc').val();
-
-            if (!ruc || ruc.length !== 11) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: '{% trans "Invalid RUC" %}',
-                    text: '{% trans "Please enter a valid 11-digit RUC" %}',
-                });
-                return;
-            }
-
-            // Show loading
-            $(this).attr('disabled', true);
-            $(this).html('<span class="spinner-border spinner-border-sm me-2"></span>{% trans "Looking up..." %}');
-
-            // Simulate API call (in production, this would call SUNAT API)
-            setTimeout(() => {
-                // Mock data - replace with actual API response
-                const mockData = {
-                    business_name: 'EMPRESA DEMO S.A.C.',
-                    commercial_name: 'Empresa Demo',
-                    address: 'Av. Principal 123, Piso 4'
-                };
-
-                $('#id_business_name').val(mockData.business_name);
-                $('#id_commercial_name').val(mockData.commercial_name);
-                $('#id_address').val(mockData.address);
-
-                $(this).attr('disabled', false);
-                $(this).html('<i class="ki-duotone ki-search-list fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> {% trans "Lookup SUNAT" %}');
-
-                Swal.fire({
-                    icon: 'success',
-                    title: '{% trans "Data Retrieved" %}',
-                    text: '{% trans "Company information has been populated from SUNAT" %}',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            }, 1500);
         });
     });
 </script>

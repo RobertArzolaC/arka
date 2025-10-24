@@ -1,0 +1,449 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title_page%}{% trans "Edit Branch" %}{% endblock title_page %}
+{% block toolbar_title %}{{ entity }} - {{ branch.name }}{% endblock%}
+
+{% block extra_head %}
+    {{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+<main class="container-xxl">
+    <!-- Branch Details Form -->
+    <form method="post" enctype="multipart/form-data" class="form">
+        {% csrf_token %}
+
+        <div class="card mb-5 mb-xl-10">
+            <div class="card-header">
+                <div class="card-title m-0">
+                    <h3 class="fw-bold m-0">{% trans "Branch Information" %}</h3>
+                </div>
+            </div>
+
+            <div class="card-body p-9">
+                <!-- Name -->
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label required fw-semibold fs-6">
+                        {{ form.name.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.name class="form-control form-control-lg" %}
+                        {% if form.name.errors %}
+                            <div class="fv-plugins-message-container invalid-feedback">
+                                {{ form.name.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.description.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.description class="form-control" %}
+                    </div>
+                </div>
+
+                <!-- SUNAT Code -->
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label required fw-semibold fs-6">
+                        {{ form.sunat_code.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.sunat_code class="form-control form-control-lg" %}
+                        <div class="form-text">{% trans "4-digit establishment code for SUNAT" %}</div>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.address.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.address class="form-control" %}
+                    </div>
+                </div>
+
+                <!-- Location Fields -->
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.country.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.country class="form-select form-select-lg" %}
+                    </div>
+                </div>
+
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.region.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.region class="form-select form-select-lg" %}
+                    </div>
+                </div>
+
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.subregion.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.subregion class="form-select form-select-lg" %}
+                    </div>
+                </div>
+
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.city.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.city class="form-select form-select-lg" %}
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.phone.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.phone class="form-control" %}
+                    </div>
+                </div>
+
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.email.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.email class="form-control" %}
+                    </div>
+                </div>
+
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-semibold fs-6">
+                        {{ form.website.label }}
+                    </label>
+                    <div class="col-lg-8 fv-row">
+                        {% render_field form.website class="form-control" %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex justify-content-end py-6 px-9">
+                <a href="{{ back_url }}" class="btn btn-light btn-active-light-primary me-2">
+                    {% trans "Cancel" %}
+                </a>
+                <button type="submit" class="btn btn-primary px-6">
+                    {% trans "Update" %}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Document Series Management -->
+    <div class="card mb-5 mb-xl-10">
+        <div class="card-header">
+            <div class="card-title m-0">
+                <h3 class="fw-bold m-0">{% trans "Document Series Management" %}</h3>
+            </div>
+        </div>
+
+        <div class="card-body p-9">
+            <!-- Info Alert -->
+            <div class="alert alert-info d-flex align-items-center p-5 mb-6">
+                <i class="ki-duotone ki-information-5 fs-2x me-4">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                <div class="d-flex flex-column">
+                    <h5 class="mb-1">{% trans "Info" %}</h5>
+                    <span>{% trans "If you don't create a series for each document type, you won't be able to issue all available payment vouchers." %}</span>
+                </div>
+            </div>
+
+            <!-- Add New Series Form -->
+            <div class="card card-bordered mb-6">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h4>{% trans "Add New Document Series" %}</h4>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="addSeriesForm">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label required">{{ series_form.document_type.label }}</label>
+                                {% render_field series_form.document_type class="form-select" %}
+                                <div class="invalid-feedback" id="document_type_error"></div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label required">{{ series_form.series_number.label }}</label>
+                                {% render_field series_form.series_number class="form-control" %}
+                                <div class="invalid-feedback" id="series_number_error"></div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label required">{{ series_form.current_correlative.label }}</label>
+                                {% render_field series_form.current_correlative class="form-control" %}
+                                <div class="invalid-feedback" id="current_correlative_error"></div>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary w-100" onclick="addSeries()">
+                                    <i class="ki-duotone ki-plus fs-2"></i>
+                                    {% trans "Add" %}
+                                </button>
+                            </div>
+                        </div>
+                        <div id="form_errors" class="alert alert-danger mt-3 d-none"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Series Listing -->
+            <div class="table-responsive">
+                <table class="table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3" id="seriesTable">
+                    <thead>
+                        <tr class="fw-bold text-muted">
+                            <th class="min-w-200px">{% trans "Document Type" %}</th>
+                            <th class="min-w-100px">{% trans "Series" %}</th>
+                            <th class="min-w-120px">{% trans "Correlative" %}</th>
+                            <th class="min-w-100px text-end">{% trans "Actions" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for series in document_series %}
+                        <tr id="series-{{ series.id }}">
+                            <td>
+                                <span class="badge badge-light-primary fs-7 fw-bold">
+                                    {{ series.get_document_type_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-bold">{{ series.series_number }}</span>
+                            </td>
+                            <td>
+                                <span class="text-muted">{{ series.current_correlative }}</span>
+                            </td>
+                            <td class="text-end">
+                                <button type="button"
+                                        class="btn btn-sm btn-icon btn-light-danger"
+                                        onclick="deleteSeries({{ series.id }})">
+                                    <i class="ki-duotone ki-trash fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                        <span class="path5"></span>
+                                    </i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr id="no-series-row">
+                            <td colspan="4" class="text-center text-muted py-5">
+                                {% trans "No document series registered yet" %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}
+
+{% block extra_js %}
+{{ form.media.js }}
+<script>
+    const companyPk = {{ company.pk }};
+    const branchPk = {{ branch.pk }};
+    const csrfToken = '{{ csrf_token }}';
+
+    function addSeries() {
+        const form = document.getElementById('addSeriesForm');
+        const formData = new FormData(form);
+
+        // Clear previous errors
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        document.querySelectorAll('.invalid-feedback').forEach(el => {
+            el.textContent = '';
+            el.style.display = 'none';
+        });
+        document.getElementById('form_errors').classList.add('d-none');
+
+        fetch(`{% url 'apps.customers:document_series_create' company.pk branch.pk %}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add new row to table
+                const tbody = document.querySelector('#seriesTable tbody');
+                const noSeriesRow = document.getElementById('no-series-row');
+
+                if (noSeriesRow) {
+                    noSeriesRow.remove();
+                }
+
+                const newRow = document.createElement('tr');
+                newRow.id = `series-${data.series.id}`;
+                newRow.innerHTML = `
+                    <td>
+                        <span class="badge badge-light-primary fs-7 fw-bold">
+                            ${data.series.document_type}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="fw-bold">${data.series.series_number}</span>
+                    </td>
+                    <td>
+                        <span class="text-muted">${data.series.current_correlative}</span>
+                    </td>
+                    <td class="text-end">
+                        <button type="button"
+                                class="btn btn-sm btn-icon btn-light-danger"
+                                onclick="deleteSeries(${data.series.id})">
+                            <i class="ki-duotone ki-trash fs-3">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                                <span class="path4"></span>
+                                <span class="path5"></span>
+                            </i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(newRow);
+
+                // Reset form
+                form.reset();
+
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: '{% trans "Success!" %}',
+                    text: data.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                // Display errors
+                if (data.errors) {
+                    for (const [field, errors] of Object.entries(data.errors)) {
+                        const errorDiv = document.getElementById(`${field}_error`);
+                        const inputField = document.getElementById(`id_${field}`);
+
+                        if (errorDiv && inputField) {
+                            errorDiv.textContent = errors.join(', ');
+                            errorDiv.style.display = 'block';
+                            inputField.classList.add('is-invalid');
+                        }
+                    }
+
+                    // Show non-field errors
+                    if (data.errors.__all__) {
+                        const formErrors = document.getElementById('form_errors');
+                        formErrors.textContent = data.errors.__all__.join(', ');
+                        formErrors.classList.remove('d-none');
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '{% trans "Error" %}',
+                        text: data.message || '{% trans "An error occurred" %}'
+                    });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: '{% trans "Error" %}',
+                text: '{% trans "An error occurred while adding the series" %}'
+            });
+        });
+    }
+
+    function deleteSeries(seriesId) {
+        Swal.fire({
+            title: '{% trans "Are you sure?" %}',
+            text: '{% trans "This action cannot be undone" %}',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '{% trans "Yes, delete it!" %}',
+            cancelButtonText: '{% trans "Cancel" %}'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`{% url 'apps.customers:document_series_delete' company.pk branch.pk 0 %}`.replace('/0/', `/${seriesId}/`), {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove row from table
+                        const row = document.getElementById(`series-${seriesId}`);
+                        if (row) {
+                            row.remove();
+                        }
+
+                        // Check if table is empty
+                        const tbody = document.querySelector('#seriesTable tbody');
+                        if (tbody.children.length === 0) {
+                            const noDataRow = document.createElement('tr');
+                            noDataRow.id = 'no-series-row';
+                            noDataRow.innerHTML = `
+                                <td colspan="4" class="text-center text-muted py-5">
+                                    {% trans "No document series registered yet" %}
+                                </td>
+                            `;
+                            tbody.appendChild(noDataRow);
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: '{% trans "Deleted!" %}',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '{% trans "Error" %}',
+                            text: data.message || '{% trans "An error occurred while deleting the series" %}'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: '{% trans "Error" %}',
+                        text: '{% trans "An error occurred while deleting the series" %}'
+                    });
+                });
+            }
+        });
+    }
+</script>
+{% endblock extra_js %}

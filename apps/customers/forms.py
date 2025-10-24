@@ -327,3 +327,171 @@ class CompanyCertificateForm(forms.ModelForm):
         if commit:
             certificate.save()
         return certificate
+
+
+class BranchForm(forms.ModelForm):
+    """Form for creating and editing branch information."""
+
+    class Meta:
+        model = models.Branch
+        fields = [
+            "name",
+            "description",
+            "sunat_code",
+            "address",
+            "country",
+            "region",
+            "subregion",
+            "city",
+            "phone",
+            "email",
+            "website",
+        ]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "rows": 3}
+            ),
+            "sunat_code": forms.TextInput(attrs={"class": "form-control"}),
+            "address": forms.TextInput(attrs={"class": "form-control"}),
+            "country": autocomplete.ModelSelect2(
+                url="apps.core:country-autocomplete",
+                attrs={"class": "form-select", "data-control": "select2"},
+            ),
+            "region": autocomplete.ModelSelect2(
+                url="apps.core:region-autocomplete",
+                forward=["country"],
+                attrs={
+                    "class": "form-select",
+                    "data-control": "select2",
+                    "placeholder": _("Department"),
+                },
+            ),
+            "subregion": autocomplete.ModelSelect2(
+                url="apps.core:subregion-autocomplete",
+                forward=["region"],
+                attrs={
+                    "class": "form-select",
+                    "data-control": "select2",
+                    "placeholder": _("Province"),
+                },
+            ),
+            "city": autocomplete.ModelSelect2(
+                url="apps.core:city-autocomplete",
+                forward=["country", "region", "subregion"],
+                attrs={
+                    "class": "form-select",
+                    "data-control": "select2",
+                    "placeholder": _("District"),
+                },
+            ),
+            "phone": forms.TextInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+            "website": forms.URLInput(attrs={"class": "form-control"}),
+        }
+
+    def clean_sunat_code(self) -> str:
+        """Validate SUNAT code format (4 digits)."""
+        sunat_code = self.cleaned_data.get("sunat_code")
+        if sunat_code and not sunat_code.isdigit():
+            raise forms.ValidationError(
+                _("SUNAT code must contain only digits")
+            )
+        if sunat_code and len(sunat_code) != 4:
+            raise forms.ValidationError(_("SUNAT code must be exactly 4 digits"))
+        return sunat_code
+
+
+class DocumentSeriesForm(forms.ModelForm):
+    """Form for creating and editing document series."""
+
+    class Meta:
+        model = models.DocumentSeries
+        fields = ["document_type", "series_number", "current_correlative"]
+        widgets = {
+            "document_type": forms.Select(attrs={"class": "form-select"}),
+            "series_number": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": _("e.g., F001, B001, T001"),
+                }
+            ),
+            "current_correlative": forms.NumberInput(
+                attrs={"class": "form-control", "min": 1}
+            ),
+        }
+
+    def clean(self) -> dict:
+        """
+        Validate SUNAT series naming conventions.
+
+        Raises:
+            ValidationError: If the series number doesn't match the document type convention.
+
+        Returns:
+            dict: Cleaned form data.
+        """
+        cleaned_data = super().clean()
+        document_type = cleaned_data.get("document_type")
+        series_number = cleaned_data.get("series_number")
+
+        if document_type and series_number:
+            series_number = series_number.upper()
+            cleaned_data["series_number"] = series_number
+
+            # SUNAT series naming conventions
+            conventions = {
+                "01": ("F", _("Factura Electrónica")),  # Factura
+                "03": ("B", _("Boleta de Venta Electrónica")),  # Boleta
+                "07": (
+                    ("F", "B"),
+                    _("Nota de Crédito Electrónica"),
+                ),  # Nota de Crédito
+                "08": (
+                    ("F", "B"),
+                    _("Nota de Débito Electrónica"),
+                ),  # Nota de Débito
+                "09": ("T", _("Guía de Remisión Electrónica")),  # Guía de Remisión
+            }
+
+            if document_type in conventions:
+                required_prefix, doc_name = conventions[document_type]
+
+                # Check if series starts with required prefix(es)
+                if isinstance(required_prefix, tuple):
+                    if not any(
+                        series_number.startswith(prefix)
+                        for prefix in required_prefix
+                    ):
+                        raise forms.ValidationError(
+                            _(
+                                "For %(doc_type)s, the series must start with %(prefix)s"
+                            )
+                            % {
+                                "doc_type": doc_name,
+                                "prefix": _(" or ").join(required_prefix),
+                            }
+                        )
+                else:
+                    if not series_number.startswith(required_prefix):
+                        raise forms.ValidationError(
+                            _(
+                                "For %(doc_type)s, the series must start with '%(prefix)s'"
+                            )
+                            % {"doc_type": doc_name, "prefix": required_prefix}
+                        )
+
+            # Validate series format (letter followed by 3 digits)
+            if len(series_number) != 4:
+                raise forms.ValidationError(
+                    _("Series number must be exactly 4 characters (e.g., F001)")
+                )
+
+            if not series_number[0].isalpha() or not series_number[1:].isdigit():
+                raise forms.ValidationError(
+                    _(
+                        "Series number must be 1 letter followed by 3 digits (e.g., F001)"
+                    )
+                )
+
+        return cleaned_data

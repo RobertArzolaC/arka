@@ -65,3 +65,25 @@ class BaseUserTracked(models.Model):
 
     class Meta:
         abstract = True
+
+
+class BaseNameDescription(models.Model):
+    name = models.CharField(_("Name"), max_length=200)
+    description = models.TextField(_("Description"), blank=True)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+
+class BaseIsActive(models.Model):
+    is_active = models.BooleanField(
+        _("Is active"),
+        default=True,
+        help_text=_("Designates whether this entry is active"),
+    )
+
+    class Meta:
+        abstract = True

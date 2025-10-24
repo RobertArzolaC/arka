@@ -447,5 +447,8 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-prompts.txt
+prompts/
 media/
+
+# mcp logs
+.playwright-mcp
