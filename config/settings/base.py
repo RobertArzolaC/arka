@@ -123,9 +123,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "es-pe"
 
-TIME_ZONE = "America/Chicago"
+TIME_ZONE = "America/Lima"
 
 USE_I18N = True
 
@@ -148,17 +148,14 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Translation settings
 # https://docs.djangoproject.com/en/5.0/topics/i18n/translation/
 
-LANGUAGES = (
-    ("es", _("Spanish")),
-    ("en", _("English")),
-)
+LANGUAGES = (("es", _("Spanish")),)
 
 LOCALE_PATHS = [BASE_DIR / "locale/"]
 
 # Django Cities Light settings
 # https://github.com/yourlabs/django-cities-light
 
-CITIES_LIGHT_TRANSLATION_LANGUAGES = ["es", "en"]
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ["es"]
 CITIES_LIGHT_INCLUDE_COUNTRIES = ["PE"]
 
 # Django Allauth settings
@@ -182,7 +179,7 @@ ACCOUNT_LOGOUT_ON_GET = True
 
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",

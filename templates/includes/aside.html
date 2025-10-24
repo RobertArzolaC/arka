@@ -36,7 +36,7 @@
             </a>
           {% endif %}
           {% if perms.customers.view_patient %}
-            <a class="menu-link {% if "patients" in request.path %}active{% endif %}" href="{% url 'apps.customers:patient_list' %}">
+            <a class="menu-link {% if "patients" in request.path %}active{% endif %}" href="">
               <span class="menu-icon">
                 <i class="fa-solid fa-hospital-user"></i>
               </span>
@@ -46,7 +46,7 @@
             </a>
           {% endif %}
           {% if perms.laboratory.view_medicaltest %}
-            <a class="menu-link {% if "medical_tests" in request.path %}active{% endif %}" href="{% url 'apps.laboratory:medical_test_list' %}">
+            <a class="menu-link {% if "medical_tests" in request.path %}active{% endif %}" href="">
               <span class="menu-icon">
                 <i class="fa-solid fa-flask"></i>
               </span>
@@ -56,7 +56,7 @@
             </a>
           {% endif %}
           {% if perms.laboratory.view_panel %}
-            <a class="menu-link {% if "panels" in request.path %}active{% endif %}" href="{% url 'apps.laboratory:panel_list' %}">
+            <a class="menu-link {% if "panels" in request.path %}active{% endif %}" href="">
               <span class="menu-icon">
                 <i class="fa-solid fa-flask-vial"></i>
               </span>
@@ -66,7 +66,7 @@
             </a>
           {% endif %}
           {% if perms.laboratory.view_order %}
-            <a class="menu-link {% if "/orders/" in request.path %}active{% endif %}" href="{% url 'apps.laboratory:order_list' %}">
+            <a class="menu-link {% if "/orders/" in request.path %}active{% endif %}" href="">
               <span class="menu-icon">
                 <i class="fa-solid fa-notes-medical"></i>
               </span>
@@ -76,7 +76,7 @@
             </a>
           {% endif %}
           {% if perms.laboratory.view_orderresult %}
-            <a class="menu-link {% if "results" in request.path %}active{% endif %}" href="{% url 'apps.laboratory:order_result_list' %}">
+            <a class="menu-link {% if "results" in request.path %}active{% endif %}" href="">
               <span class="menu-icon">
                 <i class="fa-solid fa-briefcase-medical"></i>
               </span>
@@ -86,9 +86,9 @@
             </a>
           {% endif %}
           {% if perms.laboratory.view_directorder %}
-            <a class="menu-link {% if "/direct-orders/" in request.path %}active{% endif %}" href="{% url 'apps.laboratory:direct_order_list' %}">
+            <a class="menu-link {% if "/direct-orders/" in request.path %}active{% endif %}" href="">
               <span class="menu-icon">
-                <i class="ki-duotone ki-delivery-3                        ">
+                <i class="ki-duotone ki-delivery-3">
                   <span class="path1"></span>
                   <span class="path2"></span>
                   <span class="path3"></span>
@@ -100,7 +100,7 @@
             </a>
           {% endif %}
           {% if perms.laboratory.report_order %}
-            <a class="menu-link {% if "/orders/export/" in request.path %}active{% endif %}" href="{% url 'apps.reports:order_export' %}">
+            <a class="menu-link {% if "/orders/export/" in request.path %}active{% endif %}" href="">
               <span class="menu-icon">
                 <i class="ki-duotone ki-cheque">
                   <span class="path1"></span>
